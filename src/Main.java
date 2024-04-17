@@ -1,16 +1,21 @@
 import models.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner teclado = new Scanner(System.in);
         Administrador administrador = new Administrador();
+        ArrayList<Venta> ventasRealizadas = new ArrayList<>();
         Cajero cajero = new Cajero();
-        Venta venta = new Venta();
+        Venta venta;
         Inventario inventario = new Inventario();
         administrador.setLlaveADM(true);
         cajero.setLlaveCJ(true);
         boolean aperturaCaja = false;
         int intentos = 5;
+        boolean productos=true;
         System.out.println("Ingresa contraseña:");
         System.out.println("_____________________");
         do {
@@ -44,29 +49,38 @@ public class Main {
                             System.out.println("_____________________");
                             System.out.println("Registrar Venta");
                             System.out.println("_____________________");
-                            do {
-                                System.out.println("ID del producto:");
-                                venta.setId(teclado.nextInt());
-                                System.out.println("Cantidad del producto:");
-                                int cantidadRes = teclado.nextInt();
-                                for (Producto item : inventario.getProductos()) {
-                                    if (venta.getId() == item.getId()) {
-                                        double total = item.getPrecio();
-                                        total = total * cantidadRes;
-                                        venta.setTotal(total);
-                                        venta.setVentas(venta);
-                                        int cantidad = item.getCantidad();
-                                        cantidadRes = cantidad - cantidadRes;
-                                        item.setCantidad(cantidadRes);
+                            if (productos!=true){
+                                do {
+                                    System.out.println("ID del producto:");
+                                    int id = teclado.nextInt();
+                                    System.out.println("Cantidad del producto:");
+                                    int cantidadRes = teclado.nextInt();
+                                    double totalVP=0;
+                                    for (Producto item : inventario.getProductos()) {
+                                        if (id == item.getId()) {
+                                            totalVP = item.getPrecio();
+                                            totalVP = totalVP * cantidadRes;
+                                            int cantidad = item.getCantidad();
+                                            cantidad = cantidad - cantidadRes;
+                                            item.setCantidad(cantidad);
+                                        }
                                     }
-                                }
-                                System.out.println("_____________________");
-                                System.out.println("Quiere agragar otro producto?");
-                                System.out.println("1.SI");
-                                System.out.println("2.NO");
-                                System.out.println("_____________________");
-                                respuesta2 = teclado.nextInt();
-                            } while (respuesta2 == 1);
+                                    String cant = String.valueOf(cantidadRes);
+                                    venta = new Venta();
+                                    venta.setId(id);
+                                    venta.setCantidadP(cant);
+                                    venta.setTotal(totalVP);
+                                    ventasRealizadas.add(venta);
+                                    System.out.println("_____________________");
+                                    System.out.println("Quiere agragar otro producto?");
+                                    System.out.println("1.SI");
+                                    System.out.println("2.NO");
+                                    System.out.println("_____________________");
+                                    respuesta2 = teclado.nextInt();
+                                } while (respuesta2 == 1);
+                            }else {
+                                System.out.println("No hay productos");
+                            }
                             break;
                         case 2:
                             System.out.println("_____________________");
@@ -79,6 +93,7 @@ public class Main {
                             double precio = teclado.nextInt();
                             System.out.println("Cantidad Disponibles");
                             int cantidad = teclado.nextInt();
+                            productos=false;
                             Producto producto = new Producto(id, nombre, precio, cantidad);
                             inventario.setProductos(producto);
                             break;
@@ -118,12 +133,16 @@ public class Main {
                 int respuesta = teclado.nextInt();
                 switch (respuesta) {
                     case 1:
+                        double totalFinal=0;
                         System.out.println("_____________________");
-                        for (Venta item: venta.getVentas()) {
+                        for (Venta item: ventasRealizadas) {
                             System.out.println("ID producto: " + item.getId());
-                            System.out.println("Total de venta: " + item.getTotal());
+                            System.out.println("Cantidad: " + item.getCantidadP());
+                            System.out.println("Venta:" + item.getTotal());
+                            totalFinal=totalFinal+ item.getTotal();
                             System.out.println("_____________________");
                         }
+                        System.out.println("Total de venta: " + totalFinal);
                         break;
                     case 2:
                         System.out.println("Apertura caja ---------------");
